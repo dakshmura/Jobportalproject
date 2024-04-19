@@ -1,0 +1,36 @@
+﻿@model IEnumerable<Jobportalproject.Models.jobobjects>
+
+<div>
+    <h2>Available Jobs</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Serial No</th>
+                <th scope="col">Title</th>
+                <th scope="col">Description</th>
+                <th scope="col">Location</th>
+                <th scope="col">Salary</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int serialNo = 1;
+            }
+            @foreach (var job in Model)
+            {
+                <tr>
+                    <td>@serialNo</td>
+                    <td>@job.Title</td>
+                    <td>@job.Description</td>
+                    <td>@job.Location</td>
+                    <td>@job.Salary</td>
+                    <td>
+                        <a href="#" class="btn btn-primary">Apply</a>
+                    </td>
+                </tr>
+                serialNo++;
+            }
+        </tbody>
+    </table>
+</div>

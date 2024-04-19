@@ -1,0 +1,186 @@
+﻿@model Jobportalproject.Models.UserObjects
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration</title>
+    <style>
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>User Registration</h1>
+    <form id="registrationForm" method="post">
+        <div>
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="firstName">
+            <span id="firstNameError" class="error"></span>
+        </div>
+        <div>
+            <label for="lastName">Last Name:</label>
+            <input type="text"  id="lastName" name="lastName">
+            <span id="lastNameError" class="error"></span>
+        </div>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email">
+            <span id="emailError" class="error"></span>
+        </div>
+        <div>
+            <label for="userName">Username:</label>
+            <input type="text" id="userName" name="userName">
+            <span id="userNameError" class="error"></span>
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password">
+            <span id="passwordError" class="error"></span>
+        </div>
+        <div>
+            <label for="confirmPassword">Confirm Password:</label>
+            <input type="password"id="confirmPassword" name="confirmPassword">
+            <span id="confirmPasswordError" class="error"></span>
+        </div>
+        <button type="button" id="usersubmit">Register</button>
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#usersubmit').click(function (event) {
+                event.preventDefault(); // Prevent form submission
+
+                // Get form data
+                var firstName = $("#firstName").val();
+                var lastName = $("#lastName").val();
+                var email = $("#email").val();
+                var userName = $("#userName").val();
+                var password = $("#password").val();
+                var confirmPassword = $("#confirmPassword").val();
+
+                // Reset error messages
+                $(".error").text('');
+
+                // Validate form
+                let isValid = true;
+
+                if (!firstName) {
+                    $("#firstNameError").text("First Name is required");
+                    isValid = false;
+                }
+
+                if (!lastName) {
+                    $("#lastNameError").text("Last Name is required");
+                    isValid = false;
+                }
+
+                if (!email) {
+                    $("#emailError").text("Email is required");
+                    isValid = false;
+                }
+
+                if (!userName) {
+                    $("#userNameError").text("Username is required");
+                    isValid = false;
+                }
+
+                if (!password) {
+                    $("#passwordError").text("Password is required");
+                    isValid = false;
+                }
+
+                if (!confirmPassword) {
+                    $("#confirmPasswordError").text("Confirm Password is required");
+                    isValid = false;
+                } else if (confirmPassword !== password) { // Compare password and confirm password
+                    $("#confirmPasswordError").text("Passwords do not match");
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    return;
+                }
+
+                // Check email existence
+                var data = new FormData();
+                data.append("EmailId", email);
+                $.ajax({
+                    type: "POST",
+                    url: "/JobPortal/EmailIdCheck",
+                    data: data,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        console.log(data);
+                        if (data!="false") {
+                            $("#emailError").text("Email already exists");
+                        } else {
+                            // Register user
+                            var formData = new FormData();
+                            formData.append("FirstName", firstName);
+                            formData.append("LastName", lastName);
+                            formData.append("EmailId", email);
+                            formData.append("UserName", userName);
+                            formData.append("Password", password);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "/JobPortal/UserRegistration",
+                                data: formData,
+                                contentType: false,
+                                processData: false,
+                                success: function (response) {
+                                    // Handle success
+                                    console.log("User registered successfully");
+                                    swal({
+                                        icon: "success",
+                                        text: "User registered successfully!",
+                                        type: "success",
+                                        button: "OK",
+                                    }).then(function () {
+                                        window.location.href = '@Url.Action("UserLogin", "JobPortal")';
+                                    });
+
+                                },
+                                error: function (error) {
+                                    // Handle error
+                                    console.error("Error:", error);
+                                }
+                            });
+                        }
+                    },
+                    error: function (error) {
+                        // Handle error
+                        console.error("Error:", error);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+
+</body>
+</html>
